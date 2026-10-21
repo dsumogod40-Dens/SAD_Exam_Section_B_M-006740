@@ -1,0 +1,983 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#00874a">
+<title>Scholarship Monitor</title>
+
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #eceff4;
+  --ink: #1f2d26;
+  --mut: #5a6b62;
+  --g: #00874a;
+  --g2: #006c3b;
+  --mint: #dff5ea;
+  --y: #ffc107;
+  --line: #d3dae2;
+  --hi: #ffffff;
+  --lo: #c5ccd6;
+
+  --up: 6px 6px 12px var(--lo), -6px -6px 12px var(--hi);
+  --sm: 3px 3px 7px var(--lo), -3px -3px 7px var(--hi);
+  --in: inset 3px 3px 6px var(--lo),
+        inset -3px -3px 6px var(--hi);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font: 15px/1.5 'IBM Plex Sans', system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  min-height: 100vh;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+#app {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  min-height: 100vh;
+  width: 100%;
+}
+
+body:not(.in) #app,
+body.nosb #app {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+body:not(.in) aside,
+body:not(.in) .banner,
+body.nosb aside {
+  display: none;
+}
+
+/* SIDEBAR */
+
+aside {
+  background: var(--bg);
+  border-right: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 20;
+  padding-bottom: 20px;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 22px 14px;
+  color: var(--g2);
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.brand img {
+  display: block;
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  border-radius: 18px;
+  padding: 5px;
+  background: var(--bg);
+  box-shadow: var(--up);
+}
+
+.brand span {
+  display: block;
+  line-height: 1.3;
+}
+
+.user {
+  background: var(--mint);
+  padding: 14px 16px;
+  overflow-wrap: anywhere;
+}
+
+.user b {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.dot {
+  font-size: 13px;
+  color: var(--g2);
+}
+
+.dot::before {
+  content: '';
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--g);
+  margin-right: 6px;
+}
+
+.navh {
+  padding: 16px 16px 6px;
+  font-size: 12px;
+  color: var(--mut);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+#nav button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: var(--ink);
+  box-shadow: none;
+  border-radius: 0;
+  padding: 12px 16px;
+}
+
+#nav button:hover {
+  background: var(--mint);
+}
+
+#nav button.on {
+  background: #dde2e6;
+  box-shadow: inset 4px 0 0 var(--g);
+  font-weight: 600;
+}
+
+/* TOP HEADER */
+
+.banner {
+  background: var(--g);
+  color: #fff;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  box-shadow: 0 3px 10px #00000022;
+  min-width: 0;
+}
+
+.banner h1 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 auto 0 0;
+  overflow-wrap: anywhere;
+}
+
+.banner label {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin: 0;
+  color: #fff;
+}
+
+.banner select {
+  display: inline-block;
+  width: auto;
+  margin: 0;
+  padding: 6px 10px;
+  box-shadow: none;
+  background: #fff;
+}
+
+.banner button {
+  background: var(--y);
+  color: #3d2f00;
+  box-shadow: none;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.banner button:hover {
+  background: #ffcd38;
+}
+
+#burger {
+  background: transparent !important;
+  color: #fff !important;
+  font-size: 21px;
+  padding: 0 8px !important;
+}
+
+/* MAIN CONTENT */
+
+main {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+}
+
+#msg {
+  position: sticky;
+  top: 8px;
+  z-index: 5;
+  margin-bottom: 12px;
+  border-radius: 12px;
+}
+
+#msg.err,
+#msg.ok {
+  padding: 10px 14px;
+  box-shadow: var(--sm);
+}
+
+#msg.err {
+  background: #fbe3e3;
+  color: #8f2525;
+}
+
+#msg.ok {
+  background: var(--mint);
+  color: #0b5a32;
+}
+
+/* NEUMORPHIC CARDS */
+
+.card {
+  width: 100%;
+  min-width: 0;
+  background: var(--bg);
+  border: 1px solid #e5e9ef;
+  border-radius: 16px;
+  padding: 18px;
+  margin: 0 0 16px;
+  box-shadow: var(--up);
+}
+
+/* LOGIN PAGE: CENTERED ONLY WHEN LOGIN IS VISIBLE */
+
+#v-login {
+  width: min(100%, 420px);
+  margin: 0;
+}
+
+body:not(.in) main:has(#v-login:not([hidden])) {
+  min-height: calc(100vh - 24px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#v-login .login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+#v-login .login-brand img {
+  display: block;
+  width: 105px;
+  height: 105px;
+  object-fit: contain;
+  border-radius: 24px;
+  padding: 8px;
+  margin: 0 auto 16px;
+  background: var(--bg);
+  box-shadow: var(--up);
+}
+
+#v-login .login-brand h1 {
+  color: var(--g2);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0 0 6px;
+}
+
+#v-login .login-brand p {
+  color: var(--mut);
+  font-size: 14px;
+  margin: 0;
+}
+
+#v-login h2 {
+  font-size: 18px;
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+#v-login form > button[type="submit"],
+#login button {
+  width: 100%;
+  margin-top: 6px;
+  padding: 11px 16px;
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+
+/* HEADINGS AND FORMS */
+
+h2 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: var(--g2);
+}
+
+p {
+  overflow-wrap: anywhere;
+}
+
+.muted {
+  color: var(--mut);
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  color: var(--mut);
+  margin-bottom: 12px;
+}
+
+input,
+select,
+textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin-top: 4px;
+  padding: 10px 12px;
+  color: var(--ink);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: var(--in);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--g);
+  outline-offset: 2px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #87938c;
+}
+
+button {
+  font: inherit;
+  padding: 9px 16px;
+  border-radius: 10px;
+  border: 0;
+  background: var(--g);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: var(--sm);
+  transition: background .15s ease, box-shadow .15s ease;
+}
+
+button:hover {
+  background: var(--g2);
+}
+
+button:active {
+  box-shadow: var(--in);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--g2);
+  outline-offset: 3px;
+}
+
+button.alt {
+  background: var(--bg);
+  color: var(--g2);
+}
+
+button.alt:hover {
+  background: var(--mint);
+}
+
+button.warn {
+  background: var(--bg);
+  color: #a02727;
+}
+
+button.warn:hover {
+  background: #fbe3e3;
+}
+
+.grid {
+  display: grid;
+  gap: 0 14px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.stats {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 16px;
+}
+
+.stat {
+  min-width: 0;
+  background: var(--bg);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: var(--up);
+  color: var(--mut);
+}
+
+.stat b {
+  display: block;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--g);
+  overflow-wrap: anywhere;
+}
+
+.split {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.pane {
+  min-width: 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+th {
+  font-weight: 600;
+  color: var(--mut);
+  font-size: 13px;
+}
+
+tr[data-id] {
+  cursor: pointer;
+}
+
+tr[data-id]:hover {
+  background: var(--mint);
+}
+
+tr.on {
+  background: var(--mint);
+  box-shadow: inset 3px 0 0 var(--g);
+}
+
+.wrap {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.chip {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #e3e8ee;
+  color: #3b4654;
+}
+
+.c-pending,
+.c-held {
+  background: #fdf1d6;
+  color: #7a4e00;
+}
+
+.c-verified,
+.c-compliant,
+.c-approved {
+  background: #d3f0e0;
+  color: #0b5a32;
+}
+
+.c-returned,
+.c-with-deficiency {
+  background: #fbe3e3;
+  color: #8f2525;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 8px 0;
+}
+
+.row input {
+  flex: 1;
+  min-width: 140px;
+  margin: 0;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+  margin: 10px 0;
+}
+
+dt {
+  font-size: 12px;
+  color: var(--mut);
+}
+
+dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.fail {
+  color: #a02727;
+}
+
+.pass {
+  color: #0b5a32;
+}
+
+details {
+  margin-top: 12px;
+}
+
+summary {
+  cursor: pointer;
+  color: var(--g2);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1050px) {
+  #app {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 800px) {
+  #app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  aside {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: -260px;
+    width: 250px;
+    height: 100dvh;
+    transition: left .2s ease;
+    box-shadow: none;
+  }
+
+  aside.open {
+    left: 0;
+    box-shadow: 8px 0 24px #00000022;
+  }
+
+  .banner {
+    padding: 11px 12px;
+  }
+
+  .banner h1 {
+    font-size: 17px;
+  }
+
+  main {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 15px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  }
+
+  .row > label {
+    flex: 1;
+    min-width: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  #v-login {
+    width: 100%;
+  }
+
+  #v-login .login-brand img {
+    width: 88px;
+    height: 88px;
+  }
+
+  #v-login .login-brand h1 {
+    font-size: 21px;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .stat {
+    padding: 12px;
+  }
+
+  .stat b {
+    font-size: 24px;
+  }
+
+  .banner {
+    gap: 8px;
+  }
+
+  .banner h1 {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<aside id="side">
+  <div class="brand">
+    <img src="./logo.png" alt="Scholarship Monitor Logo">
+    <span>Scholarship Monitor</span>
+  </div>
+
+  <div class="user">
+    <b id="who"></b>
+    <span class="dot">Online</span>
+  </div>
+
+  <div class="navh">Main navigation</div>
+  <nav id="nav"></nav>
+</aside>
+
+<div>
+  <div class="banner">
+    <button id="burger" aria-label="Toggle menu">&#9776;</button>
+    <h1 id="ttl"></h1>
+
+    <span id="bf" class="row" hidden style="margin:0">
+      <label>AY<select id="f-ay"></select></label>
+      <label>Semester
+        <select id="f-sem">
+          <option>1</option>
+          <option>2</option>
+        </select>
+      </label>
+    </span>
+
+    <button id="out" hidden>Logout</button>
+  </div>
+
+  <main>
+    <div id="msg" role="status" aria-live="polite"></div>
+
+    <!-- LOGIN -->
+    <section id="v-login" class="card" hidden>
+      <div class="login-brand">
+        <img src="./logo.png" alt="Scholarship Monitor Logo">
+        <h1>Scholarship Monitor</h1>
+        <p>Scholarship records, academic progress, and renewal monitoring.</p>
+      </div>
+
+      <h2>Sign in to your account</h2>
+
+      <form id="login" novalidate>
+        <label>
+          Email address
+          <input
+            id="email"
+            type="email"
+            autocomplete="username"
+            placeholder="Enter your email"
+            required
+          >
+        </label>
+
+        <label>
+          Password
+          <input
+            id="pw"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Enter your password"
+            required
+          >
+        </label>
+
+        <button type="submit">Sign in</button>
+      </form>
+
+      <p class="muted" style="font-size:12px;margin:18px 0 0;text-align:center">
+        Authorized users only. Please sign in with your assigned account.
+      </p>
+    </section>
+
+    <!-- SCHOLAR SECTION -->
+    <section id="v-scholar" hidden>
+
+      <div class="pane" id="p-dash">
+        <div class="stats" id="s-stats"></div>
+
+        <div class="card">
+          <h2>Welcome</h2>
+          <p class="muted">
+            Use Submit Grades to send a semester summary, and My Submissions
+            to follow its verification, compliance, and renewal status.
+          </p>
+        </div>
+      </div>
+
+      <div class="pane card" id="p-submit" hidden>
+        <h2 id="s-title">Submit semester grades</h2>
+
+        <form id="sform" novalidate>
+          <div class="grid">
+            <label>Academic year
+              <select id="s-ay"></select>
+            </label>
+
+            <label>Semester
+              <select id="s-sem">
+                <option>1</option>
+                <option>2</option>
+              </select>
+            </label>
+
+            <label>GWA (1.00 best, 5.00 failing)
+              <input id="s-gwa" inputmode="decimal">
+            </label>
+
+            <label>Enrolled units
+              <input id="s-units" inputmode="numeric">
+            </label>
+
+            <label>Failed subjects
+              <input id="s-failed" inputmode="numeric">
+            </label>
+
+            <label>Incomplete grades
+              <input id="s-inc" inputmode="numeric">
+            </label>
+
+            <label>Dropped subjects
+              <input id="s-drop" inputmode="numeric">
+            </label>
+          </div>
+
+          <label>Grade-document reference
+            <input id="s-ev" placeholder="e.g. a file name or document ID">
+          </label>
+
+          <button id="s-go" type="submit">Submit grades</button>
+          <button type="button" id="s-cancel" class="alt" hidden>
+            Cancel correction
+          </button>
+        </form>
+      </div>
+
+      <div class="pane card" id="p-mine" hidden>
+        <h2>My submissions</h2>
+        <div id="mine"></div>
+      </div>
+
+      <div class="pane card" id="p-access" hidden>
+        <h2>Role-access check</h2>
+        <p class="muted">
+          Tries to read another scholar's record and to verify a record.
+          The database should deny both actions.
+        </p>
+        <button id="acc" class="alt">Run access check</button>
+        <p id="acc-out"></p>
+      </div>
+
+    </section>
+
+    <!-- STAFF SECTION -->
+    <section id="v-staff" hidden>
+
+      <div class="pane" id="p-sdash">
+        <div class="stats" id="stats"></div>
+
+        <div class="card">
+          <h2>Review queue</h2>
+          <p class="muted">
+            Open Submissions to verify evidence, evaluate compliance,
+            and record renewal decisions for the selected semester.
+          </p>
+        </div>
+      </div>
+
+      <div class="pane split" id="p-list" hidden>
+        <div class="card">
+          <h2>Submissions</h2>
+
+          <div class="row">
+            <input id="f-q" placeholder="Search student ID or name">
+
+            <select id="f-prog" style="width:auto">
+            </select>
+
+            <select id="f-comp" style="width:auto">
+              <option value="">All compliance</option>
+              <option>Not evaluated</option>
+              <option>Compliant</option>
+              <option>With Deficiency</option>
+            </select>
+          </div>
+
+          <div class="wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Program</th>
+                  <th>Submission</th>
+                  <th>Compliance</th>
+                  <th>Renewal</th>
+                </tr>
+              </thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" id="detail">
+          <p class="muted">Select a submission to review.</p>
+        </div>
+      </div>
+
+      <div class="pane card" id="p-reg" hidden>
+        <h2>Register a scholar</h2>
+
+        <form id="rform" novalidate>
+          <div class="grid">
+            <label>Student ID
+              <input id="r-id">
+            </label>
+
+            <label>Full name
+              <input id="r-name">
+            </label>
+
+            <label>Program
+              <select id="r-prog"></select>
+            </label>
+
+            <label>Login email (optional)
+              <input id="r-email" type="email">
+            </label>
+          </div>
+
+          <button type="submit">Register and assign</button>
+        </form>
+      </div>
+
+    </section>
+  </main>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+
+<script>
+/* Mobile sidebar toggle. */
+(() => {
+  const burger = document.getElementById('burger');
+  const side = document.getElementById('side');
+
+  if (burger && side) {
+    burger.addEventListener('click', () => {
+      side.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (event) => {
+      if (
+        window.innerWidth <= 800 &&
+        side.classList.contains('open') &&
+        !side.contains(event.target) &&
+        !burger.contains(event.target)
+      ) {
+        side.classList.remove('open');
+      }
+    });
+
+    side.addEventListener('click', (event) => {
+      if (window.innerWidth <= 800 && event.target.closest('#nav button')) {
+        side.classList.remove('open');
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>
