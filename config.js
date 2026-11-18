@@ -1,5 +1,5 @@
 
 window.CONFIG = {
-  url: 'https://otcmiyyyzkbflvlttanx.supabase.co',
-  anonKey: 'sb_publishable_FPbVR_fxUcoKkhzlKN7EzQ_3owB91uf'
+  url: 'https://otdhdwurpmgpjxhzxkia.supabase.co',
+  anonKey: 'sb_publishable_3VtOs0vzeIHk8ALYPxtI7g_ekMWyLN-'
 };
